@@ -1,3 +1,8 @@
+import fs from "fs/promises";
+import path from "path";
+
+const STORAGE_DIR = path.join(import.meta.dirname, "storage/openingHours");
+
 export const Day = {
 	monday: 0,
 	tusday: 1,
@@ -8,42 +13,30 @@ export const Day = {
 	sunday: 7,
 };
 
-let openingHours = [
-	{
-		from: 8 * 60,
-		to: 16 * 60,
-	},
-	{
-		from: 8 * 60,
-		to: 16 * 60,
-	},
-	{
-		from: 8 * 60,
-		to: 16 * 60,
-	},
-	{
-		from: 8 * 60,
-		to: 16 * 60,
-	},
-	{
-		from: 8 * 60,
-		to: 16 * 60,
-	},
-	{
-		from: 8 * 60,
-		to: 16 * 60,
-	},
-	{
-		from: 8 * 60,
-		to: 16 * 60,
-	},
-];
+const DEFAULT_HOURS = {
+	from: 8 * 60,
+	to: 16 * 60,
+};
 
-export const getOpeningHours = () => openingHours;
+const getDayFilePath = (day) => path.join(STORAGE_DIR, `${day}.json`);
+
+export const getOpeningHours = async (day) => {
+	try {
+		const rawData = await fs.readFile(getDayFilePath(day));
+		return JSON.parse(rawData);
+	} catch (error) {
+		if (error.code === "ENOENT") {
+			return DEFAULT_HOURS;
+		}
+		throw new error();
+	}
+};
+
+export const listOpeningHours = () => {
+	const mappedPromises = Object.values(Day).map(getOpeningHours);
+	return Promise.all(mappedPromises);
+};
 
 export const updateOpeningHour = ({ day, from, to }) => {
-	openingHours[day] = {
-		from,
-		to,
-	};
+	return fs.writeFile(getDayFilePath(day), JSON.stringify({ from, to }));
 };

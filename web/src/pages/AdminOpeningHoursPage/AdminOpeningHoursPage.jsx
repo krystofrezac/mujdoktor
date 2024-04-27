@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { DynamicContent } from "../../components/DynamicContent";
-import { useOpeningHoursQuery } from "../../hooks/requests/useOpeningHoursQuery";
 import { Card, Stack, Button } from "react-bootstrap";
 import { OpeningHoursEditModal } from "./OpeningHoursEditModal";
 import { minutesFromMidnightToTime } from "./helpers/minutesFromMidnightToTime";
 import { DAYS_TRANSLATION } from "./constants";
+import { useListOpeningHoursQuery } from "../../hooks/requests/useListOpeningHoursQuery";
 
 export const AdminOpeningHoursPage = () => {
-	const query = useOpeningHoursQuery();
+	const query = useListOpeningHoursQuery();
 
 	const [dayToEdit, setDayToEdit] = useState(undefined);
 
@@ -18,7 +18,7 @@ export const AdminOpeningHoursPage = () => {
 	const renderContent = (days) => {
 		const mappedDays = days.map((openingHours, index) => {
 			const handleEdit = () => {
-				setDayToEdit({ ...openingHours, index });
+				setDayToEdit({ ...openingHours, day: index });
 			};
 
 			const title = DAYS_TRANSLATION[index];
@@ -47,7 +47,7 @@ export const AdminOpeningHoursPage = () => {
 			<OpeningHoursEditModal
 				show={!!dayToEdit}
 				defaultValues={dayToEdit}
-				dayIndex={dayToEdit?.index}
+				day={dayToEdit?.day}
 				onClose={handleEditModalClose}
 			/>
 			<DynamicContent {...query} renderContent={renderContent} />

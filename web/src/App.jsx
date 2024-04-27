@@ -4,6 +4,7 @@ import { GuestLayout } from "./components/GuestLayout";
 import { AdminLayout } from "./components/AdminLayout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AdminOpeningHoursPage } from "./pages/AdminOpeningHoursPage/AdminOpeningHoursPage";
+import { SnackbarProvider } from "notistack";
 
 const queryClient = new QueryClient();
 
@@ -31,8 +32,10 @@ const router = createBrowserRouter([
 
 export const App = () => {
 	return (
-		<QueryClientProvider client={queryClient}>
-			<RouterProvider router={router} />
-		</QueryClientProvider>
+		<SnackbarProvider>
+			<QueryClientProvider client={queryClient}>
+				<RouterProvider router={router} />
+			</QueryClientProvider>
+		</SnackbarProvider>
 	);
 };

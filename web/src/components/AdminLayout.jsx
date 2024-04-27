@@ -24,9 +24,11 @@ export const AdminLayout = () => {
 					</Link>
 				}
 			/>
-			<PathTabs tabs={TABS} />
 			<Container className="pt-4">
-				<Outlet />
+				<PathTabs tabs={TABS} />
+				<div className="pt-4">
+					<Outlet />
+				</div>
 			</Container>
 		</>
 	);

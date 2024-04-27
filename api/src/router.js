@@ -1,5 +1,5 @@
 import {
-	getOpeningHoursHandler,
+	listOpeningHoursHandler,
 	updateOpeningHourHandler,
 } from "./handlers/openingHoursHandler.js";
 import {
@@ -10,8 +10,8 @@ import {
 } from "./handlers/proceduresHandler.js";
 
 export const setupRouter = (app) => {
-	app.get("/opening-hours", getOpeningHoursHandler);
-	app.put("/opening-hour/:day", updateOpeningHourHandler);
+	app.get("/opening-hours", listOpeningHoursHandler);
+	app.put("/opening-hours/:day", updateOpeningHourHandler);
 
 	app.get("/procedures", getProceduresHandler);
 	app.post("/procedure", createProcedureHandler);
