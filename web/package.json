@@ -1,0 +1,31 @@
+{
+	"name": "web",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "npm run load-dev-env && npm run vite:dev",
+		"load-dev-env": "react-env --path .env.dev --prefix CLIENT",
+		"vite:dev": "vite --port 3000",
+		"build": "vite build",
+		"preview": "vite preview",
+		"format": "prettier . -w --use-tabs"
+	},
+	"dependencies": {
+		"@beam-australia/react-env": "^3.1.1",
+		"@tanstack/react-query": "^5.32.0",
+		"bootstrap": "^5.3.3",
+		"clsx": "^2.1.1",
+		"react": "^18.2.0",
+		"react-bootstrap": "^2.10.2",
+		"react-dom": "^18.2.0",
+		"react-router-dom": "^6.23.0"
+	},
+	"devDependencies": {
+		"@types/react": "^18.2.66",
+		"@types/react-dom": "^18.2.22",
+		"@vitejs/plugin-react": "^4.2.1",
+		"prettier": "^3.2.5",
+		"vite": "^5.2.0"
+	}
+}

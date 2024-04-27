@@ -1,0 +1,29 @@
+import { Spinner } from "react-bootstrap";
+
+export const DynamicContent = ({ isPending, error, data, renderContent }) => {
+	if (isPending) {
+		return (
+			<div className="d-flex justify-content-center">
+				<Spinner variant="primary" />
+			</div>
+		);
+	}
+
+	if (error) {
+		return (
+			<div className="d-flex justify-content-center">
+				<h3>Unexpected error</h3>
+			</div>
+		);
+	}
+
+	if (!data) {
+		return (
+			<div className="d-flex justify-content-center">
+				<h3>No data</h3>
+			</div>
+		);
+	}
+
+	return renderContent(data);
+};

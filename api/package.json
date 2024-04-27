@@ -1,0 +1,23 @@
+{
+	"name": "@mujdoktor/api",
+	"version": "1.0.0",
+	"type": "module",
+	"engines": {
+		"node": "20",
+		"npm": "10"
+	},
+	"scripts": {
+		"dev": "nodemon --exec 'npm run start'",
+		"start": "node src/main.js",
+		"format": "prettier . -w --use-tabs"
+	},
+	"dependencies": {
+		"cors": "^2.8.5",
+		"express": "^4.19.2",
+		"zod": "^3.22.5"
+	},
+	"devDependencies": {
+		"nodemon": "^3.1.0",
+		"prettier": "^3.2.5"
+	}
+}
