@@ -1,7 +1,11 @@
+import { idSchema } from "../helpers/idSchema.js";
+import { sendError } from "../helpers/sendError.js";
+import { sortByDate } from "../helpers/sortByDate.js";
 import {
 	createProcedure,
 	deleteProcedure,
-	getProcedures,
+	getProcedure,
+	listProcedures,
 	updateProcedure,
 } from "../stores/proceduresStore.js";
 import { z } from "zod";
@@ -12,11 +16,20 @@ const durationSchema = z
 	.min(1)
 	.max(24 * 60);
 
-export const getProceduresHandler = (_req, res) => {
-	res.json(getProcedures());
+export const listProceduresHandler = async (_req, res) => {
+	const listProceduresResult = await listProcedures();
+	if (!listProceduresResult.success) {
+		return sendError(res, 500, listProceduresResult);
+	}
+
+	const sortedProcedures = sortByDate(
+		listProceduresResult.procedures,
+		(procedure) => procedure.createdAt,
+	);
+	res.json(sortedProcedures);
 };
 
-export const createProcedureHandler = (req, res) => {
+export const createProcedureHandler = async (req, res) => {
 	const bodySchema = z.object({
 		name: nameSchema,
 		duration: durationSchema,
@@ -27,13 +40,30 @@ export const createProcedureHandler = (req, res) => {
 		return res.status(400).json(body);
 	}
 
-	const procedure = createProcedure(body.data);
-	res.status(201).json(procedure);
+	const listResult = await listProcedures();
+	if (!listResult.success) {
+		return sendError(res, 500, listResult);
+	}
+
+	const nameError = getMaybeNameUniquenessError(
+		listResult.procedures,
+		body.data.name,
+	);
+	if (nameError) {
+		return sendError(res, 400, nameError);
+	}
+
+	const createResult = await createProcedure(body.data);
+	if (!createResult.success) {
+		return sendError(res, 500, createResult);
+	}
+
+	res.status(201).json(createResult.procedure);
 };
 
-export const updateProcedureHandler = (req, res) => {
+export const updateProcedureHandler = async (req, res) => {
 	const paramsSchema = z.object({
-		id: z.coerce.number(),
+		id: idSchema,
 	});
 	const bodySchema = z.object({
 		name: nameSchema,
@@ -50,17 +80,45 @@ export const updateProcedureHandler = (req, res) => {
 		return res.status(400).json(body.error);
 	}
 
-	const result = updateProcedure({ ...params.data, ...body.data });
+	const currentResult = await getProcedure(params.data.id);
+	if (!currentResult.success) {
+		if (currentResult.code === "ProcedureNotFound") {
+			return sendError(res, 404, currentResult);
+		}
+		return sendError(res, 500, currentResult);
+	}
+
+	const listResult = await listProcedures();
+	if (!listResult.success) {
+		return sendError(res, 500, listResult);
+	}
+
+	const proceduresWithoutCurrent = listResult.procedures.filter(
+		(procedure) => procedure.id !== params.data.id,
+	);
+	const nameError = getMaybeNameUniquenessError(
+		proceduresWithoutCurrent,
+		body.data.name,
+	);
+	if (nameError) {
+		return sendError(res, 400, nameError);
+	}
+
+	const result = await updateProcedure({
+		...params.data,
+		...body.data,
+		createdAt: currentResult.procedure.createdAt,
+	});
 	if (!result.success) {
-		return res.status(404).send("Not found");
+		return sendError(res, 500, result);
 	}
 
 	return res.status(200).json(result.procedure);
 };
 
-export const deleteProcedureHandler = (req, res) => {
+export const deleteProcedureHandler = async (req, res) => {
 	const paramsSchema = z.object({
-		id: z.coerce.number(),
+		id: idSchema,
 	});
 
 	const params = paramsSchema.safeParse(req.params);
@@ -68,10 +126,28 @@ export const deleteProcedureHandler = (req, res) => {
 		return res.status(400).json(params.error);
 	}
 
-	const result = deleteProcedure(params.data.id);
+	const result = await deleteProcedure(params.data.id);
 	if (!result.success) {
-		return res.status(404).send("Not found");
+		if (result.code === "ProcedureNotFound") {
+			return sendError(res, 404, result);
+		}
+		return sendError(res, 500, result);
 	}
 
 	return res.status(200).send();
+};
+
+const getMaybeNameUniquenessError = (procedures, name) => {
+	const doesProcedureWithNameExists = procedures.some(
+		(procedure) => procedure.name === name,
+	);
+	if (doesProcedureWithNameExists) {
+		return {
+			success: false,
+			code: "ProcedureNameAlreadyExists",
+			message: "Procedure with given name already exists",
+		};
+	}
+
+	return undefined;
 };

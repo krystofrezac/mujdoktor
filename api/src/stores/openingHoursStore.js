@@ -18,11 +18,11 @@ const DEFAULT_HOURS = {
 	to: 16 * 60,
 };
 
-const getDayFilePath = (day) => path.join(STORAGE_DIR, `${day}.json`);
+const getFilePath = (day) => path.join(STORAGE_DIR, `${day}.json`);
 
 export const getOpeningHours = async (day) => {
 	try {
-		const rawData = await fs.readFile(getDayFilePath(day));
+		const rawData = await fs.readFile(getFilePath(day), "utf8");
 		return JSON.parse(rawData);
 	} catch (error) {
 		if (error.code === "ENOENT") {
@@ -38,5 +38,5 @@ export const listOpeningHours = () => {
 };
 
 export const updateOpeningHour = ({ day, from, to }) => {
-	return fs.writeFile(getDayFilePath(day), JSON.stringify({ from, to }));
+	return fs.writeFile(getFilePath(day), JSON.stringify({ from, to }), "utf8");
 };

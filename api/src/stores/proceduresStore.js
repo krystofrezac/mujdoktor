@@ -1,57 +1,112 @@
-let procedures = [
-	{
-		id: 0,
-		name: "Preventivní prohlídka",
-		duration: 60,
-	},
-	{
-		id: 1,
-		name: "Vstupní prohlídka",
-		duration: 120,
-	},
-];
+import fs from "fs/promises";
+import path from "path";
+import { generatedId } from "../helpers/generateId.js";
 
-export const getProcedures = () => procedures;
+const STORAGE_DIR = path.join(import.meta.dirname, "storage/procedures");
 
-export const createProcedure = ({ name, duration }) => {
-	const id = procedures.length;
-	const procedure = { id, name, duration };
-	procedures.push(procedure);
+const getFilePath = (id) => path.join(STORAGE_DIR, `${id}.json`);
 
-	return procedure;
-};
-
-export const updateProcedure = ({ id, name, duration }) => {
-	const index = procedures.findIndex((procedure) => procedure.id === id);
-	if (index < 0) {
+export const getProcedure = async (id) => {
+	try {
+		const rawData = await fs.readFile(
+			path.join(STORAGE_DIR, `${id}.json`),
+			"utf8",
+		);
+		return { success: true, procedure: JSON.parse(rawData) };
+	} catch (err) {
+		if (err.code === "ENOENT") {
+			return {
+				success: false,
+				code: "ProcedureNotFound",
+				message: "Procedure not found",
+			};
+		}
 		return {
 			success: false,
-			code: "NotFound",
+			code: "FailedToGetProcedure",
+			message: err.message,
 		};
 	}
-
-	const procedure = { ...procedures[index], name, duration };
-	procedures[index] = procedure;
-
-	return {
-		success: true,
-		procedure,
-	};
 };
 
-export const deleteProcedure = (id) => {
-	const preLenght = procedures.length;
-	procedures = procedures.filter((procedure) => procedure.id !== id);
-	const postLength = procedures.length;
+export const listProcedures = async () => {
+	try {
+		const files = await fs.readdir(STORAGE_DIR);
+		const proceduresPromises = files.map(async (file) => {
+			const rawData = await fs.readFile(path.join(STORAGE_DIR, file), "utf8");
+			return JSON.parse(rawData);
+		});
 
-	if (preLenght === postLength) {
+		const procedures = await Promise.all(proceduresPromises);
+
+		return { success: true, procedures };
+	} catch (err) {
 		return {
 			success: false,
-			code: "NotFound",
+			code: "FailedToListProcedures",
+			message: err.message,
 		};
 	}
+};
 
-	return {
-		success: true,
-	};
+export const createProcedure = async ({ name, duration }) => {
+	try {
+		const listResult = await listProcedures();
+		if (!listResult.success) {
+			return listResult;
+		}
+
+		const id = generatedId();
+		const procedure = { id, createdAt: new Date(), name, duration };
+
+		await fs.writeFile(getFilePath(id), JSON.stringify(procedure), "utf8");
+
+		return { success: true, procedure };
+	} catch (err) {
+		return {
+			success: false,
+			code: "FailedToCreateProcedure",
+			message: err.message,
+		};
+	}
+};
+
+export const updateProcedure = async ({ id, name, duration, createdAt }) => {
+	try {
+		const procedure = { id, name, duration, createdAt };
+		await fs.writeFile(getFilePath(id), JSON.stringify(procedure), "utf8");
+		return {
+			success: true,
+			procedure,
+		};
+	} catch (err) {
+		return {
+			success: false,
+			code: "FailedToUpdateProcedure",
+			message: err.message,
+		};
+	}
+};
+
+export const deleteProcedure = async (id) => {
+	try {
+		await fs.unlink(getFilePath(id));
+
+		return {
+			success: true,
+		};
+	} catch (err) {
+		if (err.code === "ENOENT") {
+			return {
+				success: false,
+				code: "ProcedureNotFound",
+				message: "Procedure not found",
+			};
+		}
+		return {
+			success: false,
+			code: "FailedToDeleteProcedure",
+			message: err.message,
+		};
+	}
 };
