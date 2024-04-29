@@ -7,7 +7,6 @@ export const LIST_PROCEDURES_QUERY_KEY = ["procedures"];
 export const useListProcedursQuery = () => {
 	return useQuery({
 		queryKey: LIST_PROCEDURES_QUERY_KEY,
-		queryFn: () =>
-			wrapFetch(fetch(env("API_BASE_URL") + "/procedures"))
+		queryFn: () => wrapFetch(fetch(env("API_BASE_URL") + "/procedures")),
 	});
 };

@@ -33,7 +33,11 @@ export const AdminOpeningHoursPage = () => {
 							{fromFormatted}-{toFormatted}
 						</Card.Text>
 						<Stack>
-							<Button className="ms-auto" variant="primary" onClick={handleEdit}>
+							<Button
+								className="ms-auto"
+								variant="primary"
+								onClick={handleEdit}
+							>
 								Edit
 							</Button>
 						</Stack>

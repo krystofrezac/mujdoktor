@@ -1,24 +1,22 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
-import { useUpdateProcedureMutation } from "../../hooks/requests/useUpdateProcedureMutation";
 import { LIST_PROCEDURES_QUERY_KEY } from "../../hooks/requests/useListProceduresQuery";
 import { ProcedureFormFields } from "./ProcedureFormFields";
+import { useCreateProcedureMutation } from "../../hooks/requests/useCreateProcedureMutation";
 
-export const ProcedureEditModal = ({ defaultValues, onClose }) => {
+const DEFAULT_VALUES = { name: "", duration: 30 };
+
+export const ProcedureCreateModal = ({ show, onClose }) => {
 	const queryClient = useQueryClient();
-	const { mutate: updateProcedure, isPending: isUpdatePending } =
-		useUpdateProcedureMutation();
+	const { mutate: createProcedure, isPending: isCreatePending } =
+		useCreateProcedureMutation();
 	const { enqueueSnackbar } = useSnackbar();
 
-	const [values, setValues] = useState({});
+	const [values, setValues] = useState(DEFAULT_VALUES);
 	const [validated, setValidated] = useState(false);
 	const [globalError, setGlobalError] = useState(undefined);
-
-	useEffect(() => {
-		if (defaultValues) setValues(defaultValues);
-	}, [defaultValues]);
 
 	const handleNameChange = (e) => {
 		setValues((prev) => ({
@@ -36,6 +34,7 @@ export const ProcedureEditModal = ({ defaultValues, onClose }) => {
 	const handleClose = () => {
 		setValidated(false);
 		setGlobalError(undefined);
+		setValues(DEFAULT_VALUES);
 		onClose();
 	};
 
@@ -48,12 +47,12 @@ export const ProcedureEditModal = ({ defaultValues, onClose }) => {
 			return;
 		}
 
-		updateProcedure(
-			{ id: defaultValues.id, name: values.name, duration: +values.duration },
+		createProcedure(
+			{ name: values.name, duration: +values.duration },
 			{
 				onSuccess: () => {
 					enqueueSnackbar({
-						message: "Procedure updated successfully",
+						message: "Procedure created successfully",
 						variant: "success",
 					});
 					queryClient.invalidateQueries({
@@ -69,7 +68,7 @@ export const ProcedureEditModal = ({ defaultValues, onClose }) => {
 					}
 
 					enqueueSnackbar({
-						message: "Procedure update failed",
+						message: "Procedure creation failed",
 						variant: "error",
 					});
 				},
@@ -81,14 +80,13 @@ export const ProcedureEditModal = ({ defaultValues, onClose }) => {
 		<Alert variant="danger">{globalError}</Alert>
 	);
 
-	const show = !!defaultValues;
-	const submitText = isUpdatePending ? "Saving..." : "Save";
+	const submitText = isCreatePending ? "Saving..." : "Save";
 
 	return (
 		<Modal show={show} onHide={handleClose}>
 			<Form noValidate validated={validated} onSubmit={handleSubmit}>
 				<Modal.Header closeButton>
-					<Modal.Title>Update procedure</Modal.Title>
+					<Modal.Title>Create procedure</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
 					{maybeGlobalErrorAlert}
@@ -99,7 +97,7 @@ export const ProcedureEditModal = ({ defaultValues, onClose }) => {
 					/>
 				</Modal.Body>
 				<Modal.Footer>
-					<Button type="submit" disabled={isUpdatePending}>
+					<Button type="submit" disabled={isCreatePending}>
 						{submitText}
 					</Button>
 				</Modal.Footer>

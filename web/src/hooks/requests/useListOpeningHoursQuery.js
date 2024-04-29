@@ -7,7 +7,6 @@ export const LIST_OPENING_HOURS_QUERY_KEY = ["opening-hours"];
 export const useListOpeningHoursQuery = () => {
 	return useQuery({
 		queryKey: LIST_OPENING_HOURS_QUERY_KEY,
-		queryFn: () =>
-			wrapFetch(fetch(env("API_BASE_URL") + "/opening-hours"))
+		queryFn: () => wrapFetch(fetch(env("API_BASE_URL") + "/opening-hours")),
 	});
 };

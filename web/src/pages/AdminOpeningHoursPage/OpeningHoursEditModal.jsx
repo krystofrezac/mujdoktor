@@ -8,11 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { LIST_OPENING_HOURS_QUERY_KEY } from "../../hooks/requests/useListOpeningHoursQuery";
 import { useSnackbar } from "notistack";
 
-export const OpeningHoursEditModal = ({
-	defaultValues,
-	day,
-	onClose,
-}) => {
+export const OpeningHoursEditModal = ({ defaultValues, day, onClose }) => {
 	const queryClient = useQueryClient();
 	const { mutate: updateOpeningHours, isPending: isUpdatePending } =
 		useUpdateOpeningHoursMutation();
@@ -96,7 +92,7 @@ export const OpeningHoursEditModal = ({
 	);
 
 	const submitText = isUpdatePending ? "Saving..." : "Save";
-	const show = !!defaultValues
+	const show = !!defaultValues;
 
 	return (
 		<Modal show={show} onHide={handleClose}>
