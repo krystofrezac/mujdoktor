@@ -2,9 +2,9 @@ import { useState } from "react";
 import { DynamicContent } from "../../components/DynamicContent";
 import { Card, Stack, Button } from "react-bootstrap";
 import { OpeningHoursEditModal } from "./OpeningHoursEditModal";
-import { minutesFromMidnightToTime } from "./helpers/minutesFromMidnightToTime";
 import { DAYS_TRANSLATION } from "./constants";
 import { useListOpeningHoursQuery } from "../../hooks/requests/useListOpeningHoursQuery";
+import { minutesFromMidnightToTime } from "./helpers/minutesFromMidnightToTime";
 
 export const AdminOpeningHoursPage = () => {
 	const query = useListOpeningHoursQuery();
@@ -32,9 +32,11 @@ export const AdminOpeningHoursPage = () => {
 						<Card.Text>
 							{fromFormatted}-{toFormatted}
 						</Card.Text>
-						<Button variant="primary" onClick={handleEdit}>
-							Edit
-						</Button>
+						<Stack>
+							<Button className="ms-auto" variant="primary" onClick={handleEdit}>
+								Edit
+							</Button>
+						</Stack>
 					</Card.Body>
 				</Card>
 			);
@@ -45,7 +47,6 @@ export const AdminOpeningHoursPage = () => {
 	return (
 		<>
 			<OpeningHoursEditModal
-				show={!!dayToEdit}
 				defaultValues={dayToEdit}
 				day={dayToEdit?.day}
 				onClose={handleEditModalClose}

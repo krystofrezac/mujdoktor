@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
-import { minutesFromMidnightToTime } from "./helpers/minutesFromMidnightToTime";
-import { timeToMinutesFromMidnight } from "./helpers/timeToMinutesFromMidnight";
-import { DAYS_TRANSLATION } from "./constants";
-import { useUpdateOpeningHoursMutation } from "../../hooks/requests/useUpdateOpeningHoursMutation";
 import { useQueryClient } from "@tanstack/react-query";
-import { LIST_OPENING_HOURS_QUERY_KEY } from "../../hooks/requests/useListOpeningHoursQuery";
 import { useSnackbar } from "notistack";
+import { useUpdateProcedureMutation } from "../../hooks/requests/useUpdateProcedureMutation";
+import { LIST_PROCEDURES_QUERY_KEY } from "../../hooks/requests/useListProceduresQuery";
 
-export const ProcedureEditModal = ({ show, defaultValues, day, onClose }) => {
+export const ProcedureEditModal = ({ defaultValues, onClose }) => {
 	const queryClient = useQueryClient();
-	const { mutate: updateOpeningHours, isPending: isUpdatePending } =
-		useUpdateOpeningHoursMutation();
+	const { mutate: updateProcedure, isPending: isUpdatePending } =
+		useUpdateProcedureMutation();
 	const { enqueueSnackbar } = useSnackbar();
 
 	const [values, setValues] = useState({ from: "00:00", to: "00:00" });
@@ -20,22 +17,19 @@ export const ProcedureEditModal = ({ show, defaultValues, day, onClose }) => {
 
 	useEffect(() => {
 		if (defaultValues)
-			setValues({
-				from: minutesFromMidnightToTime(defaultValues.from),
-				to: minutesFromMidnightToTime(defaultValues.to),
-			});
+			setValues(defaultValues);
 	}, [defaultValues]);
 
-	const handleFromChange = (e) => {
+	const handleNameChange = (e) => {
 		setValues((prev) => ({
 			...prev,
-			from: e.target.value,
+			name: e.target.value,
 		}));
 	};
-	const handleToChange = (e) => {
+	const handleDurationChange = (e) => {
 		setValues((prev) => ({
 			...prev,
-			to: e.target.value,
+			duration: e.target.value,
 		}));
 	};
 
@@ -54,30 +48,26 @@ export const ProcedureEditModal = ({ show, defaultValues, day, onClose }) => {
 			return;
 		}
 
-		const fromTime = timeToMinutesFromMidnight(values.from);
-		const toTime = timeToMinutesFromMidnight(values.to);
-		if (toTime < fromTime) {
-			setGlobalError("The closing time must after the opening time");
-			return;
-		}
-		setGlobalError(undefined);
-
-		updateOpeningHours(
-			{ from: fromTime, to: toTime, day },
+		updateProcedure(
+			{ id: defaultValues.id, name: values.name, duration: values.duration },
 			{
 				onSuccess: () => {
 					enqueueSnackbar({
-						message: "Opening hours updated successfully",
+						message: "Procedure updated successfully",
 						variant: "success",
 					});
 					queryClient.invalidateQueries({
-						queryKey: LIST_OPENING_HOURS_QUERY_KEY,
+						queryKey: LIST_PROCEDURES_QUERY_KEY,
 					});
 					handleClose();
 				},
-				onError: () => {
+				onError: (error) => {
+					if (error.data.code === 'ProcedureNameAlreadyExists') {
+						return setGlobalError("The name of the procedure is already used. Choose different one")
+					}
+
 					enqueueSnackbar({
-						message: "Opening hours update failed",
+						message: "Procedure update failed",
 						variant: "error",
 					});
 				},
@@ -85,39 +75,47 @@ export const ProcedureEditModal = ({ show, defaultValues, day, onClose }) => {
 		);
 	};
 
-	const dayTranslation = DAYS_TRANSLATION[day];
 
 	const maybeGlobalErrorAlert = globalError && (
 		<Alert variant="danger">{globalError}</Alert>
 	);
 
+	const show = !!defaultValues
 	const submitText = isUpdatePending ? "Saving..." : "Save";
 
 	return (
 		<Modal show={show} onHide={handleClose}>
 			<Form noValidate validated={validated} onSubmit={handleSubmit}>
 				<Modal.Header closeButton>
-					<Modal.Title>Update opening hours for {dayTranslation}</Modal.Title>
+					<Modal.Title>Update procedure</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
 					{maybeGlobalErrorAlert}
 					<Form.Group controlId="validationCustom02">
-						<Form.Label>From</Form.Label>
+						<Form.Label>Name</Form.Label>
 						<Form.Control
-							type="time"
-							value={values.from}
+							value={values.name}
 							required
-							onChange={handleFromChange}
+							minLength={1}
+							onChange={handleNameChange}
 						/>
+						<Form.Control.Feedback type="invalid">
+							The name must be at least 1 character long
+						</Form.Control.Feedback>
 					</Form.Group>
 					<Form.Group className="mt-3">
-						<Form.Label>To</Form.Label>
+						<Form.Label>Duration in minutes</Form.Label>
 						<Form.Control
-							type="time"
-							value={values.to}
+							type="number"
+							value={values.duration}
 							required
-							onChange={handleToChange}
+							min={1}
+							max={24 * 60}
+							onChange={handleDurationChange}
 						/>
+						<Form.Control.Feedback type="invalid">
+							The duration must be at least 1 minute long
+						</Form.Control.Feedback>
 					</Form.Group>
 				</Modal.Body>
 				<Modal.Footer>

@@ -17,7 +17,7 @@ export const DynamicContent = ({ isPending, error, data, renderContent }) => {
 		);
 	}
 
-	if (!data) {
+	if (!data || data.length === 0) {
 		return (
 			<div className="d-flex justify-content-center">
 				<h3>No data</h3>

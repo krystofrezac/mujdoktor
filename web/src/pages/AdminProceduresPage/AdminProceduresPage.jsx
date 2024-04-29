@@ -2,53 +2,75 @@ import { useState } from "react";
 import { DynamicContent } from "../../components/DynamicContent";
 import { Card, Stack, Button } from "react-bootstrap";
 import { ProcedureEditModal } from "./ProcedureEditModal";
-import { minutesFromMidnightToTime } from "./helpers/minutesFromMidnightToTime";
-import { useListOpeningHoursQuery } from "../../hooks/requests/useListOpeningHoursQuery";
+import { useListProcedursQuery } from "../../hooks/requests/useListProceduresQuery";
+import { ProcedureDeleteConfirmModal } from "./ProcedureDeleteConfirmModal";
 
 export const AdminProceduresPage = () => {
-	const query = useListOpeningHoursQuery();
+	const query = useListProcedursQuery();
 
-	const [dayToEdit, setDayToEdit] = useState(undefined);
+	const [procedureIdToEdit, setProcedureIdToEdit] = useState(undefined);
+	const [procedureIdToDelete, setProcedureIdToDelete] = useState(undefined);
 
 	const handleEditModalClose = () => {
-		setDayToEdit(undefined);
+		setProcedureIdToEdit(undefined);
 	};
 
-	const renderContent = (days) => {
-		const mappedDays = days.map((openingHours, index) => {
-			const handleEdit = () => {
-				setDayToEdit({ ...openingHours, day: index });
+	const handleDeleteModalClose = () => {
+		setProcedureIdToDelete(undefined)
+	}
+
+
+	const renderContent = (procedures) => {
+		const mappedProcedures = procedures.map((procedure) => {
+			const handleEditClick = () => {
+				setProcedureIdToEdit(procedure.id);
+			};
+			const handleDeleteClick = () => {
+				setProcedureIdToDelete(procedure.id);
 			};
 
-			const title = DAYS_TRANSLATION[index];
-			const fromFormatted = minutesFromMidnightToTime(openingHours.from);
-			const toFormatted = minutesFromMidnightToTime(openingHours.to);
-
 			return (
-				<Card key={index}>
+				<Card key={procedure.id}>
 					<Card.Body>
-						<Card.Title>{title}</Card.Title>
+						<Card.Title>{procedure.name}</Card.Title>
 						<Card.Text>
-							{fromFormatted}-{toFormatted}
+							{procedure.duration} min
 						</Card.Text>
-						<Button variant="primary" onClick={handleEdit}>
-							Edit
-						</Button>
+						<Stack direction="horizontal" gap={2}>
+							<Button className="ms-auto" variant="primary" onClick={handleEditClick}>
+								Edit
+							</Button>
+							<Button variant="danger" onClick={handleDeleteClick}>
+								Delete
+							</Button>
+						</Stack>
 					</Card.Body>
 				</Card>
 			);
 		});
-		return <Stack gap={2}>{mappedDays}</Stack>;
+
+		const procedureToEdit = procedures.find(procedure => procedure.id === procedureIdToEdit)
+		const procedureToDelete = procedures.find(procedure => procedure.id === procedureIdToDelete)
+
+		return (
+			<>
+				<ProcedureEditModal
+					defaultValues={procedureToEdit}
+					onClose={handleEditModalClose}
+				/>
+				<ProcedureDeleteConfirmModal id={procedureToDelete?.id} name={procedureToDelete?.name} onClose={handleDeleteModalClose} />
+				<Stack gap={2}>{mappedProcedures}</Stack>
+			</>
+		)
 	};
 
 	return (
 		<>
-			<ProcedureEditModal
-				show={!!dayToEdit}
-				defaultValues={dayToEdit}
-				day={dayToEdit?.day}
-				onClose={handleEditModalClose}
-			/>
+			<div className="d-flex justify-content-end">
+				<Button className="mb-2">
+					Create new
+				</Button>
+			</div>
 			<DynamicContent {...query} renderContent={renderContent} />
 		</>
 	);
