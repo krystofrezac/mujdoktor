@@ -6,6 +6,7 @@ import { AdminLayout } from "./components/AdminLayout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AdminOpeningHoursPage } from "./pages/AdminOpeningHoursPage/AdminOpeningHoursPage";
 import { AdminProceduresPage } from "./pages/AdminProceduresPage/AdminProceduresPage";
+import { ReservationProcedurePage } from "./pages/ReservationProcedurePage";
 
 const queryClient = new QueryClient();
 
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
 			{
 				path: "/",
 				element: <HomePage />,
+			},
+			{
+				path: "/reservation/procedure",
+				element: <ReservationProcedurePage />,
 			},
 		],
 	},

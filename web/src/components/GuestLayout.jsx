@@ -1,5 +1,5 @@
 import { Link, Outlet } from "react-router-dom";
-import { Navbar, Container, Button } from "react-bootstrap";
+import { Container, Button } from "react-bootstrap";
 import { LayoutNav } from "./LayoutNav";
 
 export const GuestLayout = () => {
@@ -12,7 +12,11 @@ export const GuestLayout = () => {
 					</Link>
 				}
 			/>
-			<Outlet />
+			<Container className="pt-4">
+				<div className="pt-4">
+					<Outlet />
+				</div>
+			</Container>
 		</>
 	);
 };
