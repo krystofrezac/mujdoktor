@@ -23,20 +23,48 @@ const getFilePath = (day) => path.join(STORAGE_DIR, `${day}.json`);
 export const getOpeningHours = async (day) => {
 	try {
 		const rawData = await fs.readFile(getFilePath(day), "utf8");
-		return JSON.parse(rawData);
-	} catch (error) {
-		if (error.code === "ENOENT") {
-			return DEFAULT_HOURS;
+		const parsed = JSON.parse(rawData);
+		return { success: true, openingHours: parsed };
+	} catch (err) {
+		if (err.code === "ENOENT") {
+			return { success: true, openingHours: DEFAULT_HOURS };
 		}
-		throw new error();
+		return {
+			success: false,
+			code: "FailedToGetOpeningHours",
+			message: err.message,
+		};
 	}
 };
 
-export const listOpeningHours = () => {
-	const mappedPromises = Object.values(Day).map(getOpeningHours);
-	return Promise.all(mappedPromises);
+export const listOpeningHours = async () => {
+	try {
+		const mappedPromises = Object.values(Day).map(getOpeningHours);
+		const resultList = await Promise.all(mappedPromises);
+		if (!resultList.every((openingHours) => openingHours.success)) {
+			return { success: false, code: "FailedToGetOpeningHours" };
+		}
+		const openingHoursList = resultList.map((result) => result.openingHours);
+
+		return { success: true, openingHoursList };
+	} catch (err) {
+		return {
+			success: false,
+			code: "FailedToGetOpeningHours",
+			message: err.message,
+		};
+	}
 };
 
-export const updateOpeningHour = ({ day, from, to }) => {
-	return fs.writeFile(getFilePath(day), JSON.stringify({ from, to }), "utf8");
+export const updateOpeningHour = async ({ day, from, to }) => {
+	try {
+		await fs.writeFile(getFilePath(day), JSON.stringify({ from, to }), "utf8");
+		return { success: true };
+	} catch {
+		return {
+			success: false,
+			code: "FailedToGetOpeningHours",
+			message: err.message,
+		};
+	}
 };

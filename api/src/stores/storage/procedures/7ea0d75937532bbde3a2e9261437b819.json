@@ -1,1 +1,6 @@
-{"id":"7ea0d75937532bbde3a2e9261437b819","createdAt":"2024-04-29T15:30:29.910Z","name":"a","duration":30}
+{
+	"id": "7ea0d75937532bbde3a2e9261437b819",
+	"createdAt": "2024-04-29T15:30:29.910Z",
+	"name": "a",
+	"duration": 30
+}

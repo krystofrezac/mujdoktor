@@ -1,3 +1,4 @@
+import { sendError } from "../helpers/sendError.js";
 import {
 	Day,
 	listOpeningHours,
@@ -6,7 +7,11 @@ import {
 import { z } from "zod";
 
 export const listOpeningHoursHandler = async (_req, res) => {
-	res.json(await listOpeningHours());
+	const listResult = await listOpeningHours();
+	if (!listResult.success) {
+		return sendError(res, 500, listResult);
+	}
+	res.json(listResult.openingHoursList);
 };
 
 export const updateOpeningHourHandler = async (req, res) => {
@@ -38,7 +43,12 @@ export const updateOpeningHourHandler = async (req, res) => {
 		return res.status(400).json(body.error);
 	}
 
-	await updateOpeningHour({ day: params.data.day, ...body.data });
-	res.statusCode = 201;
+	const updateResult = await updateOpeningHour({
+		day: params.data.day,
+		...body.data,
+	});
+	if (!updateResult.success) {
+		return sendError(res, 500, updateResult);
+	}
 	res.status(201).send();
 };
