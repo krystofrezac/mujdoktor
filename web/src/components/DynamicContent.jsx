@@ -1,6 +1,12 @@
 import { Spinner } from "react-bootstrap";
 
-export const DynamicContent = ({ isPending, error, data, renderContent }) => {
+export const DynamicContent = ({
+	isPending,
+	error,
+	data,
+	renderContent,
+	disableEmptyCheck,
+}) => {
 	if (isPending) {
 		return (
 			<div className="d-flex justify-content-center">
@@ -17,7 +23,7 @@ export const DynamicContent = ({ isPending, error, data, renderContent }) => {
 		);
 	}
 
-	if (!data || data.length === 0) {
+	if (!data || (data.length === 0 && !disableEmptyCheck)) {
 		return (
 			<div className="d-flex justify-content-center">
 				<h3>No data</h3>

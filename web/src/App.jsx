@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AdminOpeningHoursPage } from "./pages/AdminOpeningHoursPage/AdminOpeningHoursPage";
 import { AdminProceduresPage } from "./pages/AdminProceduresPage/AdminProceduresPage";
 import { ReservationProcedurePage } from "./pages/ReservationProcedurePage";
+import { ReservationDatePage } from "./pages/ReservationDatePage/ReservationDatePage";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
 			{
 				path: "/reservation/procedure",
 				element: <ReservationProcedurePage />,
+			},
+			{
+				path: "/reservation/date",
+				element: <ReservationDatePage />,
 			},
 		],
 	},

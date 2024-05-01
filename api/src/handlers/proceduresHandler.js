@@ -1,6 +1,7 @@
 import { idSchema } from "../helpers/idSchema.js";
 import { sendError } from "../helpers/sendError.js";
 import { sortByDate } from "../helpers/sortByDate.js";
+import { getOpeningHours } from "../stores/openingHoursStore.js";
 import {
 	createProcedure,
 	deleteProcedure,
@@ -135,6 +136,48 @@ export const deleteProcedureHandler = async (req, res) => {
 	}
 
 	return res.status(200).send();
+};
+
+export const listAvailableSlotsForProcedureHandler = async (req, res) => {
+	const paramsSchema = z.object({
+		/** For some reason return previous day (possibly something with time zones). Which is good because we than don't need to transform USA day number to czech one (Sunday vs Monday) */
+		date: z.coerce.date(),
+		procedureId: idSchema,
+	});
+
+	const params = paramsSchema.safeParse(req.params);
+	if (!params.success) {
+		return res.status(400).json(params.error);
+	}
+
+	const day = params.data.date.getDay();
+	const openingHoursResult = await getOpeningHours(day);
+	if (!openingHoursResult.success) {
+		return sendError(res, 500, openingHoursResult);
+	}
+	const openingHours = openingHoursResult.openingHours;
+
+	const procedureResult = await getProcedure(params.data.procedureId);
+	if (!procedureResult.success) {
+		if (procedureResult.code === "ProcedureNotFound") {
+			return sendError(res, 404, procedureResult);
+		}
+		return sendError(res, 500, procedureResult);
+	}
+	const procedure = procedureResult.procedure;
+
+	// TODO: "substract" already booked times
+	const availableSlots = [openingHours];
+
+	const longEnoughSlots = availableSlots.reduce((acc, slot) => {
+		const slotDuration = slot.to - slot.from;
+		if (slotDuration >= procedure.duration) {
+			acc.push(slot);
+		}
+		return acc;
+	}, []);
+
+	res.json({ procedure, slots: longEnoughSlots });
 };
 
 const getMaybeNameUniquenessError = (procedures, name) => {

@@ -7,6 +7,7 @@ import {
 	deleteProcedureHandler,
 	listProceduresHandler,
 	updateProcedureHandler,
+	listAvailableSlotsForProcedureHandler,
 } from "./handlers/proceduresHandler.js";
 
 export const setupRouter = (app) => {
@@ -17,4 +18,8 @@ export const setupRouter = (app) => {
 	app.post("/procedure", createProcedureHandler);
 	app.put("/procedure/:id", updateProcedureHandler);
 	app.delete("/procedure/:id", deleteProcedureHandler);
+	app.get(
+		"/procedure/:procedureId/available-slots/:date",
+		listAvailableSlotsForProcedureHandler,
+	);
 };

@@ -9,7 +9,7 @@ export const ReservationProcedurePage = () => {
 
 	const renderContent = (procedures) => {
 		const mappedProcedures = procedures.map((procedure) => (
-			<Col sm={5} md={4} lg={3}>
+			<Col sm={5} md={4} lg={3} key={procedure.id}>
 				<Card className="mb-2">
 					<Card.Body>
 						<Card.Title>{procedure.name}</Card.Title>
@@ -18,7 +18,7 @@ export const ReservationProcedurePage = () => {
 							<Link
 								to={{
 									pathname: "/reservation/date",
-									search: `procedure=${procedure.id}`,
+									search: `procedureId=${procedure.id}`,
 								}}
 							>
 								<Button>Pick</Button>
@@ -34,7 +34,7 @@ export const ReservationProcedurePage = () => {
 	};
 
 	return (
-		<ReservationLayout step={1}>
+		<ReservationLayout activeStep={0}>
 			<DynamicContent {...query} renderContent={renderContent} />
 		</ReservationLayout>
 	);
