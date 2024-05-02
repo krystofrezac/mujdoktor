@@ -12,7 +12,9 @@ export const getProcedure = async (id) => {
 			path.join(STORAGE_DIR, `${id}.json`),
 			"utf8",
 		);
-		return { success: true, procedure: JSON.parse(rawData) };
+		const parsed = JSON.parse(rawData);
+
+		return { success: true, procedure: parsed };
 	} catch (err) {
 		if (err.code === "ENOENT") {
 			return {
@@ -57,7 +59,13 @@ export const createProcedure = async ({ name, duration }) => {
 		}
 
 		const id = generatedId();
-		const procedure = { id, createdAt: new Date(), name, duration };
+		const procedure = {
+			id,
+			createdAt: new Date(),
+			name,
+			duration,
+			deleted: false,
+		};
 
 		await fs.writeFile(getFilePath(id), JSON.stringify(procedure), "utf8");
 
@@ -71,9 +79,15 @@ export const createProcedure = async ({ name, duration }) => {
 	}
 };
 
-export const updateProcedure = async ({ id, name, duration, createdAt }) => {
+export const updateProcedure = async ({
+	id,
+	name,
+	duration,
+	createdAt,
+	deleted,
+}) => {
 	try {
-		const procedure = { id, name, duration, createdAt };
+		const procedure = { id, name, duration, createdAt, deleted };
 		await fs.writeFile(getFilePath(id), JSON.stringify(procedure), "utf8");
 		return {
 			success: true,
@@ -83,30 +97,6 @@ export const updateProcedure = async ({ id, name, duration, createdAt }) => {
 		return {
 			success: false,
 			code: "FailedToUpdateProcedure",
-			message: err.message,
-		};
-	}
-};
-
-// TODO: Cannot delete because of relation to reservation
-export const deleteProcedure = async (id) => {
-	try {
-		await fs.unlink(getFilePath(id));
-
-		return {
-			success: true,
-		};
-	} catch (err) {
-		if (err.code === "ENOENT") {
-			return {
-				success: false,
-				code: "ProcedureNotFound",
-				message: "Procedure not found",
-			};
-		}
-		return {
-			success: false,
-			code: "FailedToDeleteProcedure",
 			message: err.message,
 		};
 	}

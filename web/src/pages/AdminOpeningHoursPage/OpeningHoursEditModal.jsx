@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
 import { minutesFromMidnightToTime } from "./helpers/minutesFromMidnightToTime";
 import { timeToMinutesFromMidnight } from "./helpers/timeToMinutesFromMidnight";
-import { DAYS_TRANSLATION } from "./constants";
 import { useUpdateOpeningHoursMutation } from "../../hooks/requests/useUpdateOpeningHoursMutation";
 import { useQueryClient } from "@tanstack/react-query";
 import { LIST_OPENING_HOURS_QUERY_KEY } from "../../hooks/requests/useListOpeningHoursQuery";
 import { useSnackbar } from "notistack";
+import { DAYS_TRANSLATION } from "../../constants/daysTranslation";
 
 export const OpeningHoursEditModal = ({ defaultValues, day, onClose }) => {
 	const queryClient = useQueryClient();

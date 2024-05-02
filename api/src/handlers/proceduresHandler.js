@@ -3,7 +3,6 @@ import { sendError } from "../helpers/sendError.js";
 import { sortByDate } from "../helpers/sortByDate.js";
 import {
 	createProcedure,
-	deleteProcedure,
 	getProcedure,
 	listProcedures,
 	updateProcedure,
@@ -22,8 +21,12 @@ export const listProceduresHandler = async (_req, res) => {
 		return sendError(res, 500, listProceduresResult);
 	}
 
+	const notDeletedProcedures = listProceduresResult.procedures.filter(
+		(procedure) => !procedure.deleted,
+	);
+
 	const sortedProcedures = sortByDate(
-		listProceduresResult.procedures,
+		notDeletedProcedures,
 		(procedure) => procedure.createdAt,
 	);
 	res.json(sortedProcedures);
@@ -44,6 +47,13 @@ export const getProcedureHandler = async (req, res) => {
 			return sendError(res, 404, procedureResult);
 		}
 		return sendError(res, 500, procedureResult);
+	}
+
+	if (procedureResult.procedure.deleted) {
+		return sendError(res, 404, {
+			code: "ProcedureNotFound",
+			message: "Procedure not found",
+		});
 	}
 
 	return res.json(procedureResult.procedure);
@@ -146,19 +156,31 @@ export const deleteProcedureHandler = async (req, res) => {
 		return res.status(400).json(params.error);
 	}
 
-	const result = await deleteProcedure(params.data.id);
-	if (!result.success) {
-		if (result.code === "ProcedureNotFound") {
-			return sendError(res, 404, result);
+	const procedureResult = await getProcedure(params.data.id);
+	if (!procedureResult.success) {
+		if (procedureResult.code === "ProcedureNotFound") {
+			return sendError(res, 404, procedureResult);
 		}
-		return sendError(res, 500, result);
+		return sendError(res, 500, procedureResult);
+	}
+
+	// Cannot hard delete because of relation to reservation
+	const updateResult = await updateProcedure({
+		...procedureResult.procedure,
+		deleted: true,
+	});
+	if (!updateResult.success) {
+		return sendError(res, 500, updateResult);
 	}
 
 	return res.status(200).send();
 };
 
 const getMaybeNameUniquenessError = (procedures, name) => {
-	const doesProcedureWithNameExists = procedures.some(
+	const notDeletedProcedures = procedures.filter(
+		(procedure) => !procedure.deleted,
+	);
+	const doesProcedureWithNameExists = notDeletedProcedures.some(
 		(procedure) => procedure.name === name,
 	);
 	if (doesProcedureWithNameExists) {

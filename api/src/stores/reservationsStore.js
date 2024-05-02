@@ -13,6 +13,33 @@ const STORAGE_DIR = path.join(import.meta.dirname, "storage/reservations");
 
 const getFilePath = (id) => path.join(STORAGE_DIR, `${id}.json`);
 
+export const getReservation = async (id) => {
+	try {
+		const rawData = await fs.readFile(
+			path.join(STORAGE_DIR, `${id}.json`),
+			"utf8",
+		);
+		const parsed = JSON.parse(rawData);
+		return {
+			success: true,
+			reservation: { ...parsed, startDatetime: new Date(parsed.startDatetime) },
+		};
+	} catch (err) {
+		if (err.code === "ENOENT") {
+			return {
+				success: false,
+				code: "ReservationNotFound",
+				message: "Reservation not found",
+			};
+		}
+		return {
+			success: false,
+			code: "FailedToGetReservation",
+			message: err.message,
+		};
+	}
+};
+
 export const listReservations = async () => {
 	try {
 		const files = await fs.readdir(STORAGE_DIR);

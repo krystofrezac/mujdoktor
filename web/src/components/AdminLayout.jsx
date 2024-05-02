@@ -5,6 +5,10 @@ import { LayoutNav } from "./LayoutNav";
 
 const TABS = [
 	{
+		to: "/admin/reservations",
+		label: "Reservations",
+	},
+	{
 		to: "/admin/opening-hours",
 		label: "Opening hours",
 	},

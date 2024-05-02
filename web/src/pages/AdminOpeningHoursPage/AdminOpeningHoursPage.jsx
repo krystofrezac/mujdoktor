@@ -2,9 +2,9 @@ import { useState } from "react";
 import { DynamicContent } from "../../components/DynamicContent";
 import { Card, Stack, Button } from "react-bootstrap";
 import { OpeningHoursEditModal } from "./OpeningHoursEditModal";
-import { DAYS_TRANSLATION } from "./constants";
 import { useListOpeningHoursQuery } from "../../hooks/requests/useListOpeningHoursQuery";
 import { minutesFromMidnightToTime } from "./helpers/minutesFromMidnightToTime";
+import { DAYS_TRANSLATION } from "../../constants/daysTranslation";
 
 export const AdminOpeningHoursPage = () => {
 	const query = useListOpeningHoursQuery();

@@ -6,14 +6,14 @@ import { formatTime } from "../helpers/formatTime";
 import { ReservationLayout } from "../components/ReservationLayout";
 import { useState } from "react";
 import { Form, Button } from "react-bootstrap";
-import { useCreateProcedureMutation } from "../hooks/requests/useCreateProcedureMutation";
 import { useSnackbar } from "notistack";
+import { useCreateReservationMutation } from "../hooks/requests/useCreateReservationMutation";
 
 export const ReservationSummaryPage = () => {
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
-	const { mutate: createProcedure, isPending: isCreatePending } =
-		useCreateProcedureMutation();
+	const { mutate: createReservation, isPending: isCreatePending } =
+		useCreateReservationMutation();
 	const { enqueueSnackbar } = useSnackbar();
 
 	const [values, setValues] = useState({ email: "", phoneNumber: "" });
@@ -57,7 +57,7 @@ export const ReservationSummaryPage = () => {
 			return;
 		}
 
-		createProcedure(
+		createReservation(
 			{
 				procedureId,
 				reservationStartDatetime: datetime,

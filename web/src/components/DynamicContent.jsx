@@ -23,7 +23,7 @@ export const DynamicContent = ({
 		);
 	}
 
-	if (!data || (data.length === 0 && !disableEmptyCheck)) {
+	if (data === undefined || (data.length === 0 && !disableEmptyCheck)) {
 		return (
 			<div className="d-flex justify-content-center">
 				<span className="fs-3">No data</span>

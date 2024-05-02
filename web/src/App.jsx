@@ -10,6 +10,7 @@ import { ReservationProcedurePage } from "./pages/ReservationProcedurePage";
 import { ReservationDatePage } from "./pages/ReservationDatePage/ReservationDatePage";
 import { ReservationSummaryPage } from "./pages/ReservationSummaryPage";
 import { ReservationFinishPage } from "./pages/ReservationFinishPage";
+import { AdminReservationsPage } from "./pages/AdminReservationsPage/AdminReservationsPage";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
 		path: "/admin",
 		element: <AdminLayout />,
 		children: [
+			{
+				path: "reservations",
+				element: <AdminReservationsPage />,
+			},
 			{
 				path: "opening-hours",
 				element: <AdminOpeningHoursPage />,
