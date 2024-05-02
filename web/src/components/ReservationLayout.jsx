@@ -13,7 +13,9 @@ export const ReservationLayout = ({
 			{onGoToPreviousStep && (
 				<div className="fixed-bottom mb-2">
 					<Container>
-						<Button onClick={onGoToPreviousStep}>← Go to previous step</Button>
+						<Button variant="secondary" onClick={onGoToPreviousStep}>
+							← Go to previous step
+						</Button>
 					</Container>
 				</div>
 			)}

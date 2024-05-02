@@ -88,6 +88,7 @@ export const updateProcedure = async ({ id, name, duration, createdAt }) => {
 	}
 };
 
+// TODO: Cannot delete because of relation to reservation
 export const deleteProcedure = async (id) => {
 	try {
 		await fs.unlink(getFilePath(id));

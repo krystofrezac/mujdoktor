@@ -1,1 +1,3 @@
-export const formatApiDate = (date) => date.toISOString().split("T")[0];
+export const formatApiDate = (date) => {
+	return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+};

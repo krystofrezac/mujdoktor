@@ -4,21 +4,11 @@ import { wrapFetch } from "../../helpers/wrapFetch";
 
 export const useCreateProcedureMutation = () => {
 	return useMutation({
-		mutationFn: ({
-			procedureId,
-			reservationStartDatetime,
-			patientEmail,
-			patientPhoneNumber,
-		}) =>
+		mutationFn: ({ name, duration }) =>
 			wrapFetch(
-				fetch(env("API_BASE_URL") + "/reservation", {
+				fetch(env("API_BASE_URL") + "/procedure", {
 					method: "post",
-					body: JSON.stringify({
-						procedureId,
-						reservationStartDatetime,
-						patientEmail,
-						patientPhoneNumber,
-					}),
+					body: JSON.stringify({ name, duration }),
 					headers: {
 						"Content-Type": "application/json",
 					},

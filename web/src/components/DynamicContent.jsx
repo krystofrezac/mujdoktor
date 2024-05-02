@@ -18,7 +18,7 @@ export const DynamicContent = ({
 	if (error) {
 		return (
 			<div className="d-flex justify-content-center">
-				<h3>Unexpected error</h3>
+				<span className="fs-3">Unexpected error</span>
 			</div>
 		);
 	}
@@ -26,7 +26,7 @@ export const DynamicContent = ({
 	if (!data || (data.length === 0 && !disableEmptyCheck)) {
 		return (
 			<div className="d-flex justify-content-center">
-				<h3>No data</h3>
+				<span className="fs-3">No data</span>
 			</div>
 		);
 	}
