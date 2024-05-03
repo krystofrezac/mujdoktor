@@ -16,6 +16,7 @@ import { getMinutesFromMidnightFromDate } from "../helpers/getMinutesFromMidnigh
 import { sortByDate } from "../helpers/sortByDate.js";
 import { addDays } from "../helpers/addDays.js";
 import { getIsReservationStartTimeAvailable } from "../helpers/getIsReservationStartTimeAvailable.js";
+import { sendInputValidationError } from "../helpers/sendInputValidationError.js";
 
 export const listAvailableSlotsForProcedureHandler = async (req, res) => {
 	const paramsSchema = z.object({
@@ -25,7 +26,7 @@ export const listAvailableSlotsForProcedureHandler = async (req, res) => {
 
 	const params = paramsSchema.safeParse(req.params);
 	if (!params.success) {
-		return res.status(400).json(params.error);
+		return sendInputValidationError(res, "params", params.error);
 	}
 
 	const procedureResult = await getProcedure(params.data.procedureId);
@@ -60,7 +61,7 @@ export const createReservationHandler = async (req, res) => {
 
 	const body = bodySchema.safeParse(req.body);
 	if (!body.success) {
-		return sendError(res, 400, body.error);
+		return sendInputValidationError(res, "body", body.error);
 	}
 
 	const procedureResult = await getProcedure(body.data.procedureId);
@@ -112,7 +113,7 @@ export const getReservationsForWeek = async (req, res) => {
 
 	const params = paramsSchema.safeParse(req.params);
 	if (!params.success) {
-		return res.status(400).json(params.error);
+		return sendInputValidationError(res, "params", params.error);
 	}
 
 	const reservationsResultsPromises = Array(7)
@@ -167,12 +168,12 @@ export const respondToReservation = async (req, res) => {
 
 	const params = paramsSchema.safeParse(req.params);
 	if (!params.success) {
-		return res.status(400).json(body.error);
+		return sendInputValidationError(res, "params", params.error);
 	}
 
 	const body = bodySchema.safeParse(req.body);
 	if (!body.success) {
-		return res.status(400).json(body.error);
+		return sendInputValidationError(res, "body", body.error);
 	}
 
 	const reservationResult = await getReservation(params.data.id);
@@ -238,7 +239,7 @@ export const canReservationBeAcceptedHandler = async (req, res) => {
 
 	const params = paramsSchema.safeParse(req.params);
 	if (!params.success) {
-		return res.status(400).json(params.error);
+		return sendInputValidationError(res, "params", params.error);
 	}
 
 	const reservationResult = await getReservation(params.data.id);

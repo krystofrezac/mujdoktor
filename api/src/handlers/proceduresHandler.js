@@ -1,5 +1,6 @@
 import { idSchema } from "../helpers/idSchema.js";
 import { sendError } from "../helpers/sendError.js";
+import { sendInputValidationError } from "../helpers/sendInputValidationError.js";
 import { sortByDate } from "../helpers/sortByDate.js";
 import {
 	createProcedure,
@@ -38,7 +39,7 @@ export const getProcedureHandler = async (req, res) => {
 	});
 	const params = paramsSchema.safeParse(req.params);
 	if (!params.success) {
-		return res.status(400).json(params.error);
+		return sendInputValidationError(res, "params", params.error);
 	}
 
 	const procedureResult = await getProcedure(params.data.id);
@@ -67,7 +68,7 @@ export const createProcedureHandler = async (req, res) => {
 
 	const body = bodySchema.safeParse(req.body);
 	if (!body.success) {
-		return res.status(400).json(body);
+		return sendInputValidationError(res, "body", body.error);
 	}
 
 	const listResult = await listProcedures();
@@ -102,12 +103,12 @@ export const updateProcedureHandler = async (req, res) => {
 
 	const params = paramsSchema.safeParse(req.params);
 	if (!params.success) {
-		return res.status(400).json(params.error);
+		return sendInputValidationError(res, "params", params.error);
 	}
 
 	const body = bodySchema.safeParse(req.body);
 	if (!body.success) {
-		return res.status(400).json(body.error);
+		return sendInputValidationError(res, "body", body.error);
 	}
 
 	const currentResult = await getProcedure(params.data.id);
@@ -153,7 +154,7 @@ export const deleteProcedureHandler = async (req, res) => {
 
 	const params = paramsSchema.safeParse(req.params);
 	if (!params.success) {
-		return res.status(400).json(params.error);
+		return sendInputValidationError(res, "params", params.error);
 	}
 
 	const procedureResult = await getProcedure(params.data.id);

@@ -1,4 +1,5 @@
 import { sendError } from "../helpers/sendError.js";
+import { sendInputValidationError } from "../helpers/sendInputValidationError.js";
 import {
 	Day,
 	listOpeningHours,
@@ -35,12 +36,12 @@ export const updateOpeningHourHandler = async (req, res) => {
 
 	const params = paramsSchema.safeParse(req.params);
 	if (!params.success) {
-		return res.status(400).json(params.error);
+		return sendInputValidationError(res, "params", params.error);
 	}
 
 	const body = bodySchema.safeParse(req.body);
 	if (!body.success) {
-		return res.status(400).json(body.error);
+		return sendInputValidationError(res, "body", body.error);
 	}
 
 	const updateResult = await updateOpeningHour({
@@ -50,5 +51,5 @@ export const updateOpeningHourHandler = async (req, res) => {
 	if (!updateResult.success) {
 		return sendError(res, 500, updateResult);
 	}
-	res.status(201).send();
+	res.status(200).send();
 };

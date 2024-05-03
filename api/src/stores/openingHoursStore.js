@@ -63,7 +63,7 @@ export const updateOpeningHour = async ({ day, from, to }) => {
 	} catch {
 		return {
 			success: false,
-			code: "FailedToGetOpeningHours",
+			code: "FailedToUpdateOpeningHours",
 			message: err.message,
 		};
 	}

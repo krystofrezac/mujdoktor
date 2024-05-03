@@ -1,1 +1,7 @@
-{"id":"009bca1e8c8e05a65026edd003a0ee81","createdAt":"2024-05-02T15:39:43.975Z","name":"Psychologická konzultace po dodělání domácího úkolu","duration":60,"deleted":false}
+{
+	"id": "009bca1e8c8e05a65026edd003a0ee81",
+	"createdAt": "2024-05-02T15:39:43.975Z",
+	"name": "Psychologická konzultace po dodělání domácího úkolu",
+	"duration": 60,
+	"deleted": false
+}
