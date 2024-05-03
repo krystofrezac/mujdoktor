@@ -6,7 +6,7 @@ const STORAGE_DIR = path.join(import.meta.dirname, "storage/openingHours");
 export const Day = {
 	sunday: 0,
 	monday: 1,
-	tusday: 2,
+	tuesday: 2,
 	wednesday: 3,
 	thursday: 4,
 	friday: 5,
