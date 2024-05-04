@@ -58,14 +58,14 @@ export const ReservationDatePage = () => {
 			onGoToPreviousStep={handleGoToPreviousStep}
 		>
 			<Row>
-				<Col sm={6}>
+				<Col md={6} className="d-flex justify-content-center">
 					<DayPicker
 						mode="single"
 						selected={selectedDate}
 						onSelect={handleDateSelect}
 					/>
 				</Col>
-				<Col sm={6}>
+				<Col md={6}>
 					<DynamicContent
 						{...slotsQuery}
 						renderContent={renderSlotsContent}
