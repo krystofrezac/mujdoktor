@@ -32,7 +32,7 @@ export const updateOpeningHourHandler = async (req, res) => {
 				.min(0)
 				.max(24 * 60),
 		})
-		.refine((data) => data.from < data.to, "`to` must be later than `from`");
+		.refine((data) => data.from <= data.to, "`to` must be later than `from`");
 
 	const params = paramsSchema.safeParse(req.params);
 	if (!params.success) {
